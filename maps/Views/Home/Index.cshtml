@@ -1,0 +1,70 @@
+﻿
+<div class="row" style="height:100%; width:100%">
+
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+            * element that contains the map. */
+       
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <div id="map_canvas" style="width: 100%; height: 100%;"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@Model"></script>
+    <script src="~/Scripts/v3_epoly.js"></script>
+    <script src="~/Scripts/engine.js"></script>
+    <script>
+        var map = null;
+        var bounds = null;
+
+        function initialize() {
+            var myOptions = {
+                zoom: 10,
+                center: new google.maps.LatLng(-33.9, 151.2),
+                mapTypeControl: true,
+                mapTypeControlOptions: { style: google.maps.MapTypeControlStyle.DROPDOWN_MENU },
+                navigationControl: true,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("map_canvas"),
+                                          myOptions);
+
+            bounds = new google.maps.LatLngBounds();
+
+            google.maps.event.addListener(map, 'click', function () {
+                infowindow.close();
+            });
+            //49.4105308,26.9252192
+            var startPoint = new google.maps.LatLng(48.4105308, 26.9252192);
+            var endPoint = new google.maps.LatLng(49.796190206866830, 26);
+            var centerPoint = new google.maps.LatLng(49.4105308, 27.05);
+            createMarker(startPoint, "start: " + startPoint.toUrlValue(6) + "<br>distance to center: " + (centerPoint.distanceFrom(startPoint) / 1000).toFixed(3) + " km<br>Bearing: " + centerPoint.Bearing(startPoint) + "<br><a href='javascript:map.setCenter(new google.maps.LatLng(" + startPoint.toUrlValue(6) + "));map.setZoom(20);'>zoom in</a> - <a href='javascript:map.fitBounds(bounds);'>zoom out</a>");
+            createMarker(endPoint, "end: " + endPoint.toUrlValue(6) + "<br>distance to center: " + (centerPoint.distanceFrom(endPoint) / 1000).toFixed(3) + " km<br>Bearing: " + centerPoint.Bearing(endPoint) + "<br><a href='javascript:map.setCenter(new google.maps.LatLng(" + endPoint.toUrlValue(6) + "));map.setZoom(20);'>zoom in</a> - <a href='javascript:map.fitBounds(bounds);'>zoom out</a>");
+            createMarker(centerPoint, "center: " + centerPoint.toUrlValue(6));
+
+            var arcPts = drawArc(centerPoint, centerPoint.Bearing(startPoint), centerPoint.Bearing(endPoint), centerPoint.distanceFrom(startPoint));
+            // add the start and end lines
+            arcPts.push(centerPoint);
+            bounds.extend(centerPoint);
+            arcPts.push(startPoint);
+
+            var piePoly = new google.maps.Polygon({
+                paths: [arcPts],
+                strokeColor: "#00FF00",
+                strokeOpacity: 0.5,
+                strokeWeight: 2,
+                fillColor: "#FF0000",
+                fillOpacity: 0.35,
+                map: map
+            });
+
+            map.fitBounds(bounds);
+
+        }
+        initialize();
+
+    </script>
+</div>
