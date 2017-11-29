@@ -2,17 +2,34 @@
 <div class="row" style="height:100%; width:100%">
 
     <style>
-        /* Always set the map height explicitly to define the size of the div
-            * element that contains the map. */
        
-        /* Optional: Makes the sample page fill the window. */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
         }
+        #configuration-panel{
+            padding: 30px 10px;
+        }
+        #run{
+            float:right;
+        }
     </style>
-    <div id="map_canvas" style="width: 100%; height: 100%;"></div>
+    <div id="configuration-panel">
+        <label>Radius</label>
+        <input type="number" id="radius" />
+        <label>Direction</label>
+        <input type="number" id="direction" />
+        <label>Angle</label>
+        <select id="angle">
+            <option value="0">0</option>
+            <option value="45">45</option>
+            <option value="90">90</option>
+            <option value="180">180</option>
+        </select>
+        <button class="btn btn-info" id="run">Run</button>
+    </div>
+    <div id="map_canvas"  style="width: 100%; height: 100%;"></div>
     <script src="https://maps.googleapis.com/maps/api/js?key=@Model"></script>
     <script src="~/Scripts/v3_epoly.js"></script>
     <script src="~/Scripts/engine.js"></script>
@@ -20,6 +37,15 @@
         var map = null;
         var bounds = null;
 
+        function draw() {
+
+        }
+        /*
+            float xt=r+(x1-r)*cos(0.05)+(r-y1)*sin(0.05);
+            float yt=r+(x1-r)*sin(0.05)+(y1-r)*cos(0.05);
+            x1 = xt;
+            y1 = yt;
+        */
         function initialize() {
             var myOptions = {
                 zoom: 10,
@@ -38,11 +64,10 @@
                 infowindow.close();
             });
             //49.4105308,26.9252192
-            var startPoint = new google.maps.LatLng(48.4105308, 26.9252192);
-            var endPoint = new google.maps.LatLng(49.796190206866830, 26);
-            var centerPoint = new google.maps.LatLng(49.4105308, 27.05);
-            createMarker(startPoint, "start: " + startPoint.toUrlValue(6) + "<br>distance to center: " + (centerPoint.distanceFrom(startPoint) / 1000).toFixed(3) + " km<br>Bearing: " + centerPoint.Bearing(startPoint) + "<br><a href='javascript:map.setCenter(new google.maps.LatLng(" + startPoint.toUrlValue(6) + "));map.setZoom(20);'>zoom in</a> - <a href='javascript:map.fitBounds(bounds);'>zoom out</a>");
-            createMarker(endPoint, "end: " + endPoint.toUrlValue(6) + "<br>distance to center: " + (centerPoint.distanceFrom(endPoint) / 1000).toFixed(3) + " km<br>Bearing: " + centerPoint.Bearing(endPoint) + "<br><a href='javascript:map.setCenter(new google.maps.LatLng(" + endPoint.toUrlValue(6) + "));map.setZoom(20);'>zoom in</a> - <a href='javascript:map.fitBounds(bounds);'>zoom out</a>");
+            var startPoint = new google.maps.LatLng(50, 26.9252192);
+            var endPoint = new google.maps.LatLng(49, 26.9252192);
+            var centerPoint = new google.maps.LatLng(49.4105308, 26.9252192);
+
             createMarker(centerPoint, "center: " + centerPoint.toUrlValue(6));
 
             var arcPts = drawArc(centerPoint, centerPoint.Bearing(startPoint), centerPoint.Bearing(endPoint), centerPoint.distanceFrom(startPoint));
@@ -60,7 +85,7 @@
                 fillOpacity: 0.35,
                 map: map
             });
-
+            
             map.fitBounds(bounds);
 
         }
