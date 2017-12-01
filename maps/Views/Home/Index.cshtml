@@ -17,9 +17,9 @@
     </style>
     <div id="configuration-panel">
         <label>Radius</label>
-        <input type="number" id="radius" />
+        <input type="number" id="radius" value="100" />
         <label>Direction</label>
-        <input type="number" id="direction" />
+        <input type="number" id="direction" value="0" />
         <label>Angle</label>
         <select id="angle">
             <option value="30">30</option>
@@ -37,6 +37,8 @@
         var map = null;
         var bounds = null;
         var drawObjects = [];
+        var sin = Math.sin;
+        var cos = Math.cos;
 
         function clearAll() {
             drawObjects.forEach(function (o) {
@@ -44,19 +46,41 @@
             })
         }
 
-        function drawSector(angle) {
+        function rotate(center, point, angle) {
+            var x0 = center.x;
+            var y0 = center.y;
+            var x1 = point.x;
+            var y1 = point.y;
+
+            var x = x0 + ((x1 - x0) * cos(angle) - (y1 - y0) * sin(angle));
+
+            var y = y0 + (x1 - x0) * sin(angle) + (y1 - y0) * cos(angle);
+
+            return {x : x, y: y};
+        }
+
+        function drawSector(angle, radius, direction) {
+            
             clearAll();
-            var startPoint = new google.maps.LatLng(50.123212, 26.9252192);
+
+            direction -= angle / 2
+            
+            var radiusW = radius / 100;
+
             var centerPoint = new google.maps.LatLng(49.4105308, 26.9252192);
+            
+            var start = rotate({ x: centerPoint.lat(), y: centerPoint.lng() },
+                { x: centerPoint.lat() + radiusW, y: centerPoint.lng()}, direction.toRad())
+
+            var startPoint = new google.maps.LatLng(start.x, start.y);
             angle = angle.toRad();
 
             var x0 = centerPoint.lat();
             var y0 = centerPoint.lng();
             var x1 = startPoint.lat();
             var y1 = startPoint.lng();
-            var sin = Math.sin;
-            var cos = Math.cos;
-            console.log((x1 - x0) * cos(angle));
+           
+            
             var x = x0 + ((x1 - x0) * cos(angle) - (y1 - y0) * sin(angle));
        
             var y = y0 + (x1 - x0) * sin(angle) + (y1 - y0) * cos(angle);
@@ -102,11 +126,14 @@
                 infowindow.close();
             });
 
-            document.getElementById('angle').onchange = function () {
-                drawSector(parseInt(this.value));
+            document.getElementById('run').onclick = function () {
+                var angle = parseInt(document.getElementById('angle').value);
+                var radius = parseInt(document.getElementById('radius').value);
+                var direction = parseInt(document.getElementById('direction').value);
+                drawSector(angle, radius, direction);
             }
 
-            drawSector(30);
+            drawSector(30, 10, 0);
             //49.4105308,26.9252192
             //var startPoint = new google.maps.LatLng(50, 26.9252192);
             //var endPoint = new google.maps.LatLng(49, 26.9252192);
